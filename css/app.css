@@ -64,11 +64,71 @@ h1 {
     align-items: center;
     box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
 }
+@keyframes fail{
+    0% {
+        transform: rotate(0deg);
+    }
+    33% {
+        transform: rotate(-15deg);
+    }
+    66% {
+        transform: rotate(15deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+@keyframes out {
+    form {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(180deg);
+    }
+}
+@keyframes in {
+    form {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(-180deg);
+    }
+}
+@keyframes match {
+    0% {
+        transform:scale3d(1, 1); 
+    }
+    16.6% {
+        transform:scale(1.25, .75); 
+    }
+    33.2% {
+        transform:scale(1.5, .5); 
+    }
+    49.8% {
+        transform:scale(.75, 1.25);
+    }
+    56.4% {
+        transform:scale(.5, 1.5);
+    }
+    73% {
+        transform:scale(1.25, .75); 
+    }
+    89.6% {
+        transform:scale(.75, 1.25);
+    }
+    100% {
+        -webkit-transform:scale(1, 1);
+        transform:scale(1, 1);
+    }
+}
 
 .deck .card.open {
-    transform: rotateY(0);
     background: #02b3e4;
     cursor: default;
+    animation: in .2s ease-out;
+}
+.deck .card.open .fa{
+    animation: in .2s ease-out;
 }
 
 .deck .card.show {
@@ -79,7 +139,20 @@ h1 {
     cursor: default;
     background: #02ccba;
     font-size: 33px;
+    animation: match .6s ease-out;
 }
+
+.deck .card.fail {
+    background: #f60;
+    transform-origin: 50% 180%;
+    animation: fail .4s ease-out;
+}
+
+.deck .card.out {
+    background: #2e3d49;
+    animation: out .2s ease-out;
+}
+
 
 /*
  * Styles for the Score Panel
@@ -106,4 +179,52 @@ h1 {
 .score-panel .restart {
     float: right;
     cursor: pointer;
+}
+
+.modal{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    transform: scale(.7,.7);
+    background: #fff;
+    opacity: 0;
+    z-index: -1;
+    transition: all .2s ease-out;
+}
+.modal.in{
+    transform: scale(1,1);
+    opacity: 1;
+    z-index: 999;
+}
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%,-50%);
+}
+.modal-content > h3{
+    font-size: 30px;
+    margin: 0;
+}
+.modal-content > p{
+    margin: 0;
+    line-height: 30px;
+    color: #999;
+    font-size: 14px;
+}
+.replay-btn{
+    background: #02ccba;
+    border: 0;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    margin-top: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
 }

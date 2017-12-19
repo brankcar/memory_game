@@ -17,9 +17,9 @@
 
         <section class="score-panel">
         	<ul class="stars">
-        		<li><i class="fa fa-star"></i></li>
-        		<li><i class="fa fa-star"></i></li>
-        		<li><i class="fa fa-star"></i></li>
+        		<li><i class="fa"></i></li>
+        		<li><i class="fa"></i></li>
+        		<li><i class="fa"></i></li>
         	</ul>
 
         	<span class="moves">3</span> Moves
@@ -81,6 +81,19 @@
         </ul>
     </div>
 
+    <div id="layer" class="modal">
+        <div class="modal-content">
+            <h3>Congratulations!You Won!</h3>
+            <p>With <span class="moves"></span> and <span class="stars-number"></span> Stars.</p>
+            <p>Woooooo!</p>
+            <button class="replay-btn">Play again!</button>
+        </div>
+    </div>
+
     <script src="js/app.js"></script>
+    <script>
+        var memoryGame = new MemoryGame('deck');
+        memoryGame.init();
+    </script>
 </body>
 </html>
