@@ -132,6 +132,7 @@ MemoryGame.prototype = {
 		this.loop(this.card_array);
 		this.moves = 0;
 		this.updataScore();
+		clearInterval(this.timer_interval);
 		this.timer_interval = null;
 		this.spend_time = 0;
 		this.is_frist_click = true;
