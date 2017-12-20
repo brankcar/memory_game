@@ -41,15 +41,18 @@ var MemoryGame = function(domClass){
 		'fa-leaf',
 		'fa-bicycle'
 	];
-	this.card_array = [];			// 卡片列表
-	this.match_class = 'card match';  	// 已匹配卡片 className
+	this.card_array = [];					// 卡片列表
+	this.match_class = 'card match';  		// 已匹配卡片 className
 	this.open_class = 'card open show'; 	// 当前点击打开卡片 className
-	this.match_array = []; 			// 已匹配列表
-	this.open_array = [];			// 已打开列表
-	this.container = document.getElementsByClassName(domClass)[0]; 	// 容器 dom
-	this.star = document.getElementsByClassName('stars')[0]			// 星星
-	this.starsNumber = 0;			// 星星个数
-	this.moves = 0; 				// 步数
+	this.match_array = []; 					// 已匹配列表
+	this.open_array = [];					// 已打开列表
+	this.container = $(domClass); 			// 容器 dom
+	this.star = $('.stars');				// 星星
+	this.starsNumber = 0;					// 星星个数
+	this.moves = 0; 						// 步数
+	this.is_frist_click = true;   			// 是否第一次点击，判断游戏开始
+	this.timer_interval = null;  			// 计时器
+	this.spend_time = 0;					// 计时时间
 };
 MemoryGame.prototype = {
 	/**
@@ -78,26 +81,34 @@ MemoryGame.prototype = {
 		_this.card_array = _this.shuffle(_this.default_array.concat(_this.default_array));
 		_this.loop(_this.card_array);
 		// 重置按钮绑定点击事件，点击后重置游戏
-		document.getElementsByClassName('restart')[0].onclick = function(){
+		$('.restart').on('click', function(){
 			_this.resetGame();
-		};
+		});
 		// 卡片容器绑定点击事件，事件委托
-		_this.container.onclick = function(e){
-			var _list = this.children;
-			if(e.target.nodeName === 'LI' && (e.target.getAttribute('class').indexOf('match') >= 0 || e.target.getAttribute('class').indexOf('open show') >= 0)){
+		_this.container.on('click', 'li', function(e){
+			var _list = _this.container.find('li'),
+				$this = $(this);
+			if($this.hasClass('match') || $this.hasClass('open show')){
 				return;
 			}
-			if(e.target.nodeName === 'LI' && _this.open_array.length < 2){
-				var index = _this.show(e.target, _list);
-				var status = _this.addOpenList(index);
+			if(_this.is_frist_click){
+				_this.is_frist_click = false;
+				_this.timer_interval = setInterval(function(){
+					_this.spend_time++;
+					$('.time').text(_this.fromatTime(_this.spend_time));
+				},1000);
+			}
+			if(_this.open_array.length < 2){
+				_this.show($this, _list);
+				var status = _this.addOpenList($this.index());
 				if(typeof status === 'boolean'){
 					_this.isMatch(status)
 				}
 			}
-		}
-		document.getElementsByClassName('replay-btn')[0].onclick = function(){
+		});
+		$('.replay-btn').on('click', function(){
 			_this.playAgain();
-		}
+		});
 		_this.updataScore();
 	},
 	/**
@@ -107,11 +118,11 @@ MemoryGame.prototype = {
 	loop: function(array){
 		var html = '';
 	    array.forEach(function(value){
-	    	html += '<li class="card">'
-		                +'<i class="fa ' + value + '"></i>'
-		            +'</li>';
+	    	html += `<li class="card">
+		                <i class="fa ${value}"></i>
+		            </li>`;
 	    });
-	    this.container.innerHTML = html;
+	    this.container.html(html);
 	},
 	/**
 	 * [resetGame 重置游戏]
@@ -121,21 +132,52 @@ MemoryGame.prototype = {
 		this.loop(this.card_array);
 		this.moves = 0;
 		this.updataScore();
+		this.timer_interval = null;
+		this.spend_time = 0;
+		this.is_frist_click = true;
+		$('.time').text(this.fromatTime(this.spend_time));
+	},
+	/**
+	 * [fromatTime 转换时间，把秒转换成时分秒格式   hh:mm:ss]
+	 * @param  {[数值]} value [需要转换的时间，单位：秒]
+	 * @return {[字符串]}       [已转换好的时间，返回字符串显示到页面]
+	 */
+	fromatTime: function(value){
+		var secs = value,
+			minute = 0,
+			hour = 0;
+		if(value > 60){
+			minute = parseInt(secs/60);
+			secs = parseInt(secs%60);
+			if(minute > 60){
+				hour = parseInt(minute/60);
+				minute = parseInt(minute%60);
+			}
+		}
+		/*var result = this.timZero(secs);
+		if(minute > 0){
+			result = this.timZero(minute) + ":" + result;
+		}
+		if(hour > 0){
+			result = this.timZero(hour) + ":" + result;
+		}*/
+		return this.timZero(hour) + ":" + this.timZero(minute) + ":" + this.timZero(secs);
+	},
+	/**
+	 * [timZero 时间为个位数时数值前面补足一个“0”]
+	 * @param  {[数值]} value [添零数值]
+	 * @return {[字符串]}       [返回添零后的数值字符串]
+	 */
+	timZero: function(value){
+		return value > 9 ? value : "0" + value;
 	},
 	/**
 	 * [show 显示点击卡片]
 	 * @param  {[dom对象]} _this   [需要显示的当前卡片]
-	 * @param  {[数组]} allList [当前卡片列表]
-	 * @return {[数值]}         [当前卡片的位置下标]
 	 */
-	show: function(_this, allList){
-		if(_this.setAttribute !== this.open_class){
-			_this.setAttribute('class',this.open_class);
-		}
-		for (var i = 0; i < allList.length; i++) { 
-			if (allList[i] == _this) { 
-				return i;
-			}
+	show: function(_this){
+		if(_this.prop('class') !== this.open_class){
+			_this.prop('class',this.open_class);
 		}
 	},
 	/**
@@ -144,8 +186,7 @@ MemoryGame.prototype = {
 	 */
 	addOpenList: function(cardId){
 		var _list = this.open_array,
-			_card_list = this.card_array,
-			_children = this.container.children;
+			_card_list = this.card_array;
 		_list.push(cardId);
 		if(_list.length === 2){
 			return _card_list[_list[0]] === _card_list[_list[1]];
@@ -158,21 +199,21 @@ MemoryGame.prototype = {
 	isMatch: function(status){
 		this.moves++;
 		var _list = this.open_array,
-			_children = this.container.children;
+			_children = this.container.find('li');
 		if(status){
 			this.addMatchList();
 		}else{
-			for(var i = 0; i < _list.length; i++){
-				_children[_list[i]].setAttribute('class','card show fail');
+			for(let i = 0; i < _list.length; i++){
+				_children.eq(_list[i]).prop('class','card show fail');
 			}
 			var timer = setTimeout(function(){
-				for(var i = 0; i < _list.length; i++){
-					_children[_list[i]].setAttribute('class','card out');
+				for(let i = 0; i < _list.length; i++){
+					_children.eq(_list[i]).prop('class','card out');
 				}
 				clearTimeout(timer);
 				var timer2 = setTimeout(function(){
-					for(var i = 0; i < _list.length; i++){
-						_children[_list[i]].setAttribute('class','card');
+					for(let i = 0; i < _list.length; i++){
+						_children.eq(_list[i]).prop('class','card');
 					}
 					clearTimeout(timer2);
 					_list.splice(0,_list.length);
@@ -187,9 +228,9 @@ MemoryGame.prototype = {
 	addMatchList: function(){
 		var _list = this.open_array,
 			_card_list = this.card_array,
-			_children = this.container.children;
-		for(var i = 0; i < _list.length; i++){
-			_children[_list[i]].setAttribute('class',this.match_class);
+			_children = this.container.find('li');
+		for(let i = 0; i < _list.length; i++){
+			_children.eq(_list[i]).prop('class',this.match_class);
 			this.match_array.push(_children[_list[i]]);
 		}
 		_list.splice(0,_list.length);
@@ -201,19 +242,16 @@ MemoryGame.prototype = {
 	 * [updataScore 更新得分数据]
 	 */
 	updataScore: function(){
-		var _node = document.getElementsByClassName('moves');
-		for(var i = 0; i < _node.length; i++){
-			_node[i].innerHTML = this.moves;
-		}
+		$('.moves').text(this.moves);
 		this.starLeval();
 	},
 	/**
 	 * [starLeval 根据步数得分计算本次游戏获得多少颗星星]
 	 */
 	starLeval: function(){
-		var _children = this.star.children,
+		var _children = this.star[0].children,
 			count = 0;
-		for(var i = 0; i < _children.length; i++){
+		for(let i = 0; i < _children.length; i++){
 			if(this.moves <= 14){
 				_children[i].childNodes[0].setAttribute('class','fa fa-star');
 			}else if(this.moves > 14 && this.moves < 18){
@@ -239,16 +277,17 @@ MemoryGame.prototype = {
 	 * [gameOver 游戏结束，弹出分数]
 	 */
 	gameOver: function(){
-		var layer = document.getElementById('layer');
-		document.getElementsByClassName('stars-number')[0].innerHTML = this.starsNumber;
-		layer.setAttribute('class','modal in');
+		var layer = $('#layer');
+		$('.stars-number').text(this.starsNumber);
+		layer.prop('class','modal in');
+		clearInterval(this.timer_interval);
 	},
 	/**
 	 * [playAgain 重新开始]
 	 */
 	playAgain: function(){
-		var layer = document.getElementById('layer');
-		layer.setAttribute('class','modal');
+		var layer = $('#layer');
+		layer.prop('class','modal');
 		this.resetGame();
 	}
 }
