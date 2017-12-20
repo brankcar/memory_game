@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Matching Game</title>
     <meta name="description" content="">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Coda">
     <link rel="stylesheet" href="css/app.css">
@@ -21,79 +22,35 @@
         		<li><i class="fa"></i></li>
         		<li><i class="fa"></i></li>
         	</ul>
-
         	<span class="moves">3</span> Moves
 
+            &nbsp;&nbsp;Time <span class="time">00:00:00</span>
             <div class="restart">
         		<i class="fa fa-repeat"></i>
         	</div>
         </section>
 
         <ul class="deck">
-            <li class="card">
-                <i class="fa fa-diamond"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-paper-plane-o"></i>
-            </li>
-            <li class="card match">
-                <i class="fa fa-anchor"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-bolt"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-cube"></i>
-            </li>
-            <li class="card match">
-                <i class="fa fa-anchor"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-leaf"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-bicycle"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-diamond"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-bomb"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-leaf"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-bomb"></i>
-            </li>
-            <li class="card open show">
-                <i class="fa fa-bolt"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-bicycle"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-paper-plane-o"></i>
-            </li>
-            <li class="card">
-                <i class="fa fa-cube"></i>
-            </li>
+            
         </ul>
     </div>
 
     <div id="layer" class="modal">
         <div class="modal-content">
             <h3>Congratulations!You Won!</h3>
-            <p>With <span class="moves"></span> and <span class="stars-number"></span> Stars.</p>
+            <p>With <span class="moves"></span> Movers and <span class="stars-number"></span> Stars.</p>
             <p>Woooooo!</p>
+            <p>Time consuming <span class="time"></span></p>
             <button class="replay-btn">Play again!</button>
         </div>
     </div>
 
     <script src="js/app.js"></script>
     <script>
-        var memoryGame = new MemoryGame('deck');
-        memoryGame.init();
+        $(document).ready(function(){
+            var memoryGame = new MemoryGame('.deck');
+            memoryGame.init();
+        });
     </script>
 </body>
 </html>
