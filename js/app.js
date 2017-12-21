@@ -137,6 +137,7 @@ MemoryGame.prototype = {
 		this.spend_time = 0;
 		this.is_frist_click = true;
 		$('.time').text(this.fromatTime(this.spend_time));
+		this.match_array.splice(0,this.match_array.length);
 	},
 	/**
 	 * [fromatTime 转换时间，把秒转换成时分秒格式   hh:mm:ss]
@@ -219,7 +220,7 @@ MemoryGame.prototype = {
 					clearTimeout(timer2);
 					_list.splice(0,_list.length);
 				},200);
-			},400);
+			},600);
 		}
 		this.updataScore();
 	},
@@ -250,25 +251,25 @@ MemoryGame.prototype = {
 	 * [starLeval 根据步数得分计算本次游戏获得多少颗星星]
 	 */
 	starLeval: function(){
-		var _children = this.star[0].children,
+		var _children = this.star.find('li'),
 			count = 0;
 		for(let i = 0; i < _children.length; i++){
 			if(this.moves <= 14){
-				_children[i].childNodes[0].setAttribute('class','fa fa-star');
+				_children.eq(i).find('i').prop('class','fa fa-star');
 			}else if(this.moves > 14 && this.moves < 18){
 				if(i < 2){
-					_children[i].childNodes[0].setAttribute('class','fa fa-star');
+					_children.eq(i).find('i').prop('class','fa fa-star');
 				}else{
-					_children[i].childNodes[0].setAttribute('class','fa fa-star-o');
+					_children.eq(i).find('i').prop('class','fa fa-star-o');
 				}
 			}else{
 				if(i === 0){
-					_children[i].childNodes[0].setAttribute('class','fa fa-star');
+					_children.eq(i).find('i').prop('class','fa fa-star');
 				}else{
-					_children[i].childNodes[0].setAttribute('class','fa fa-star-o');
+					_children.eq(i).find('i').prop('class','fa fa-star-o');
 				}
 			}
-			if(_children[i].childNodes[0].getAttribute('class') === 'fa fa-star'){
+			if(_children.eq(i).find('i').prop('class') === 'fa fa-star'){
 				count++;
 			}
 		}
